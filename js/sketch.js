@@ -1,40 +1,50 @@
-// Adapted from the following Processing example:
-// http://processing.org/learning/topics/follow3.html
-console.log("hello?")
-// The amount of points in the path:
-var points = 25;
+paper.install(window);
+	window.onload = function() {
+		paper.setup('myCanvas');
 
-// The distance between the points:
-var length = 35;
+		//UTILITIES
+		const lineWidget = function(anchor, vect){
+			return new paper.Path.Line({
+				from: anchor,
+				to: anchor.add(vect),
+				strokeColor:'black',
+				strokeWeight:4
+			})
+		
+		}
 
-var path = new Path({
-	strokeColor: '#E4141B',
-	strokeWidth: 20,
-	strokeCap: 'round'
-});
 
-var start = view.center / [10, 1];
-for (var i = 0; i < points; i++)
-	path.add(start + new Point(i * length, 0));
+		const point = new paper.Point(100, 100);
+		const horizontals = [1,2,3].map(x=>{
+			let p = new paper.Point(100,100*x);
+			return lineWidget(p,[300,0]);
+		}) ;
 
-function onMouseMove(event) {
-	path.firstSegment.point = event.point;
-	for (var i = 0; i < points - 1; i++) {
-		var segment = path.segments[i];
-		var nextSegment = segment.next;
-		var vector = segment.point - nextSegment.point;
-		vector.length = length;
-		nextSegment.point = segment.point - vector;
+		//initalize the horizontal lines
+		// Create a simple drawing tool:
+		var tool = new Tool();
+		var path;
+
+		// Define a mousedown and mousedrag handler
+		tool.onMouseDown = function(event) {
+			path = new Path();
+			path.strokeColor = 'black';
+			path.add(event.point);
+		}
+
+		tool.onMouseDrag = function(event) {
+			path.add(event.point);
+		}
 	}
-	path.smooth({ type: 'continuous' });
-}
 
-function onMouseDown(event) {
-	path.fullySelected = true;
-	path.strokeColor = '#e08285';
-}
+// const slider = function(widget, interval){
+// 	return function(x){
+// 		return (x-widget.min) * (interval.max - interval.min) / (widget.max - widget.min)
+// 	}
+// }
 
-function onMouseUp(event) {
-	path.fullySelected = false;
-	path.strokeColor = '#e4141b';
-}
+// const osc = function(params, shape){
+// 	return function(t){
+// 		return params[0]+params[1]*shape(params[2]*t+params[3]);
+// 	}
+// }
